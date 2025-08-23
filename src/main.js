@@ -1,39 +1,57 @@
-import { searchImages } from './js/pixabay-api.js';
-import { updateGallery, showNoResultsMessage } from './js/render-functions.js';
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
+import { getImagesByQuery } from './js/pixabay-api';
+import {
+  createGallery,
+  gallery,
+  clearGallery,
+  showLoader,
+  hideLoader,
+} from './js/render-functions';
 
-const form = document.querySelector('.form');
-const input = document.querySelector('.input-search');
-const gallery = document.querySelector('.gallery');
-const loader = document.querySelector('.loader');
+const form = document.querySelector('form');
+const input = form.querySelector('input[name="search-text"]');
 
-// лоадер спочатку прихований
-loader.style.display = 'none';
 form.addEventListener('submit', function (event) {
   event.preventDefault();
-  const query = input.value.trim();
-  if (query === '') {
-    showNoResultsMessage('Please enter a search query!');
+  const enteredText = input.value.trim();
+
+  if (enteredText === '') {
+    iziToast.warning({
+      title: '⚠ Caution',
+      message: 'Please enter text',
+      position: 'topRight',
+      icon: '',
+    });
     return;
   }
 
-  gallery.innerHTML = ''; // очищаємо галерею перед новим пошуком
-  loader.style.display = 'block'; // показуємо лоадер
+  clearGallery();
 
-  searchImages(query)
-    .then(images => {
-      loader.style.display = 'none'; // ховаємо лоадер після отримання результатів
-      if (images.length === 0) {
-        showNoResultsMessage(
-          'Sorry, there are no images matching your search query. Please try again!'
-        );
+  showLoader();
+
+  getImagesByQuery(enteredText)
+    .then(data => {
+      hideLoader();
+      if (data.hits.length === 0) {
+        iziToast.info({
+          title: 'Info',
+          message:
+            'Sorry, there are no images matching your search query. Please try again!',
+          position: 'topRight',
+        });
         return;
       }
-      updateGallery(images);
+
+      createGallery(data.hits);
     })
+
     .catch(error => {
-      loader.style.display = 'none';
-      showNoResultsMessage('Error fetching images. Please try again!');
-      console.error('Помилка сервера:', error.message);
+      hideLoader();
+      iziToast.error({
+        title: 'Error',
+        message: 'Something went wrong. Please try again later.',
+        position: 'topRight',
+      });
     });
-  form.reset();
 });

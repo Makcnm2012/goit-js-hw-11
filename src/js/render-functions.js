@@ -1,19 +1,14 @@
-// Функції інтерфейсу
-import iziToast from 'izitoast';
-import 'izitoast/dist/css/iziToast.min.css';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-// Ініціалізація SimpleLightbox
+export const gallery = document.querySelector('.gallery');
 const lightbox = new SimpleLightbox('.gallery a', {
-  captions: true,
   captionsData: 'alt',
   captionDelay: 250,
 });
 
-// Функція для створення карток зображень
-export function createImageMarkup(images) {
-  return images
+export function createGallery(images) {
+  const markup = images
     .map(
       ({
         webformatURL,
@@ -25,32 +20,46 @@ export function createImageMarkup(images) {
         downloads,
       }) => `
       <li class="gallery-item">
-        <a class="gallery-link" href="${largeImageURL}">
-          <img class="gallery-image" src="${webformatURL}" alt="${tags}" loading="lazy" />
-        </a>
-        <div class="thumb-block">
-          <div class="block"><h2 class="tittle">Likes</h2><p class="amount">${likes}</p></div>
-          <div class="block"><h2 class="tittle">Views</h2><p class="amount">${views}</p></div>
-          <div class="block"><h2 class="tittle">Comments</h2><p class="amount">${comments}</p></div>
-          <div class="block"><h2 class="tittle">Downloads</h2><p class="amount">${downloads}</p></div>
-        </div>
-      </li>`
+  <a href="${largeImageURL}">
+    <img class="gallery-image" src="${webformatURL}" alt="${tags}" loading="lazy" />
+  </a>
+  <div class="info">
+    <div class="info-item">
+      <span class="title">Likes👍</span>
+      <span class="value">${likes}</span>
+    </div>
+    <div class="info-item">
+      <span class="title">Views👀</span>
+      <span class="value">${views}</span>
+    </div>
+    <div class="info-item">
+      <span class="title">Comments💬</span>
+      <span class="value">${comments}</span>
+    </div>
+    <div class="info-item">
+      <span class="title">Downloads⬇️</span>
+      <span class="value">${downloads}</span>
+    </div>
+  </div>
+</li>
+      `
     )
     .join('');
+
+  gallery.innerHTML = markup;
+  lightbox.refresh();
 }
 
-// Функція для оновлення галереї
-export function updateGallery(images) {
-  const gallery = document.querySelector('.gallery');
-  gallery.innerHTML = createImageMarkup(images);
-  lightbox.refresh(); // Оновлюємо SimpleLightbox після додавання нових зображень
+export function clearGallery() {
+  gallery.innerHTML = '';
 }
 
-// Функція для показу повідомлення про помилку
-export function showNoResultsMessage(message) {
-  iziToast.error({
-    title: 'Error',
-    message: message,
-    position: 'topRight',
-  });
+const loader = document.querySelector('.js-loader');
+
+export function showLoader() {
+  loader.removeAttribute('hidden');
+}
+
+export function hideLoader() {
+  loader.setAttribute('hidden', '');
 }

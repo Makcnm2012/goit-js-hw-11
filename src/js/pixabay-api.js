@@ -1,11 +1,9 @@
-// http запит на бек
 import axios from 'axios';
 
-const API_KEY = '49186769-dabefba962826c776b77806d1';
-const BASE_URL = 'https://pixabay.com/api/';
+export function getImagesByQuery(query) {
+  const BASE_URL = 'https://pixabay.com/api/';
+  const API_KEY = '51720682-06a42ac8e837caf67d8afc5f8';
 
-// функція для отримання зображень
-export function searchImages(query) {
   return axios
     .get(BASE_URL, {
       params: {
@@ -16,9 +14,5 @@ export function searchImages(query) {
         safesearch: true,
       },
     })
-    .then(response => response.data.hits)
-    .catch(error => {
-      console.error('Error fetching images:', error.message);
-      return [];
-    });
+    .then(response => response.data);
 }
